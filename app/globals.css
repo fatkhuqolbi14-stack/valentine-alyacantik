@@ -37,9 +37,53 @@ body {
     opacity: 0;
   }
 }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* ===================== */
+/* FADE MASUK HALAMAN */
+/* ===================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fade {
+  animation: fadeIn 0.8s ease forwards;
+}
+
+
+/* ===================== */
+/* LOVE RAIN ❤️ */
+/* ===================== */
+@keyframes fall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
+  }
+}
 
 .animate-fall {
   animation-name: fall;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
+}
+
+
+/* biar mobile smooth */
+html, body {
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
 }
