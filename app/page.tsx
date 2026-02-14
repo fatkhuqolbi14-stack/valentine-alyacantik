@@ -28,18 +28,28 @@ export default function Home() {
   const [hearts, setHearts] = useState<
     { left: number; duration: number; size: number }[]
   >([]);
+  const [musicReady, setMusicReady] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const start = () => setStep(1);
 
-  // ⬇️ TIDAK BOLEH await — biar ga macet di HP
+  // pindah halaman dulu, audio nyusul
   const yes = () => {
     setStep(2);
 
     setTimeout(() => {
-      audioRef.current?.play().catch(() => {});
+      audioRef.current?.play()
+        .then(() => setMusicReady(true))
+        .catch(() => {});
     }, 60);
+  };
+
+  // tombol manual play (anti gagal total)
+  const manualPlay = () => {
+    audioRef.current?.play()
+      .then(() => setMusicReady(true))
+      .catch(() => {});
   };
 
   const moveNo = () => {
@@ -48,7 +58,7 @@ export default function Home() {
     setNoPos({ x, y });
   };
 
-  // generate hearts saat step 2
+  // generate hearts
   useEffect(() => {
     if (step !== 2) return;
 
@@ -139,6 +149,16 @@ tapi aku selalu pengen ada buat kamu.
 Selama kamu masih di sini,
 aku juga bakal tetap di sini.`}
             />
+
+            {/* tombol play manual kalau browser blokir */}
+            {!musicReady && (
+              <button
+                onClick={manualPlay}
+                className="mt-4 bg-pink-500 px-5 py-2 rounded-full text-sm animate-pulse"
+              >
+                Tap untuk nyalain musik 🎵
+              </button>
+            )}
           </div>
         )}
       </div>
