@@ -28,28 +28,27 @@ export default function Home() {
   const [hearts, setHearts] = useState<
     { left: number; duration: number; size: number }[]
   >([]);
-  const [musicReady, setMusicReady] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const start = () => setStep(1);
 
-  // pindah halaman dulu, audio nyusul
-  const yes = () => {
-    setStep(2);
+  // play musik (ga boleh block UI)
+  const playMusic = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
 
-    setTimeout(() => {
-      audioRef.current?.play()
-        .then(() => setMusicReady(true))
-        .catch(() => {});
-    }, 60);
+    audio.currentTime = 0;
+    audio.muted = false;
+
+    audio.play().catch(() => {
+      console.log("autoplay blocked");
+    });
   };
 
-  // tombol manual play (anti gagal total)
-  const manualPlay = () => {
-    audioRef.current?.play()
-      .then(() => setMusicReady(true))
-      .catch(() => {});
+  const yes = () => {
+    setStep(2);
+    setTimeout(playMusic, 80);
   };
 
   const moveNo = () => {
@@ -58,7 +57,7 @@ export default function Home() {
     setNoPos({ x, y });
   };
 
-  // generate hearts
+  // generate hearts saat step 2
   useEffect(() => {
     if (step !== 2) return;
 
@@ -76,8 +75,10 @@ export default function Home() {
       className="flex min-h-screen items-center justify-center bg-black text-white text-center p-6 relative overflow-x-hidden overflow-y-auto"
       style={{ touchAction: "manipulation" }}
     >
+      {/* AUDIO */}
       <audio ref={audioRef} loop playsInline preload="auto">
         <source src="/musik/love.mp3" type="audio/mpeg" />
+        <source src="/musik/love.ogg" type="audio/ogg" />
       </audio>
 
       <div className="relative z-10 w-full flex justify-center">
@@ -130,7 +131,6 @@ export default function Home() {
         {step === 2 && (
           <div className="max-w-xl w-full flex flex-col items-center gap-6 py-10 animate-fade">
             <img
-              key={step}
               src="/her/photo.jpeg"
               className="w-64 h-64 object-cover rounded-2xl shadow-2xl shadow-pink-500/40"
             />
@@ -149,16 +149,6 @@ tapi aku selalu pengen ada buat kamu.
 Selama kamu masih di sini,
 aku juga bakal tetap di sini.`}
             />
-
-            {/* tombol play manual kalau browser blokir */}
-            {!musicReady && (
-              <button
-                onClick={manualPlay}
-                className="mt-4 bg-pink-500 px-5 py-2 rounded-full text-sm animate-pulse"
-              >
-                Tap untuk nyalain musik 🎵
-              </button>
-            )}
           </div>
         )}
       </div>
