@@ -12,7 +12,6 @@ function TypeWriter({ text }: { text: string }) {
       i++;
       if (i > text.length) clearInterval(interval);
     }, 35);
-
     return () => clearInterval(interval);
   }, [text]);
 
@@ -32,23 +31,12 @@ export default function Home() {
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // generate hearts (hindari hydration error)
-  useEffect(() => {
-    const arr = Array.from({ length: 30 }).map(() => ({
-      left: Math.random() * 100,
-      duration: 4 + Math.random() * 5,
-      size: 14 + Math.random() * 30,
-    }));
-    setHearts(arr);
-  }, []);
-
   const start = () => setStep(1);
 
-  // PLAY AUDIO HARUS LANGSUNG DARI TAP
   const yes = async () => {
     try {
       await audioRef.current?.play();
-    } catch (e) {}
+    } catch {}
     setStep(2);
   };
 
@@ -58,16 +46,29 @@ export default function Home() {
     setNoPos({ x, y });
   };
 
+  // ❤️ generate hearts SAAT step 2
+  useEffect(() => {
+    if (step !== 2) return;
+
+    const arr = Array.from({ length: 35 }).map(() => ({
+      left: Math.random() * 100,
+      duration: 4 + Math.random() * 5,
+      size: 14 + Math.random() * 30,
+    }));
+
+    setHearts(arr);
+  }, [step]);
+
   return (
     <main
-      className="flex min-h-screen items-center justify-center bg-black text-white text-center p-6 relative overflow-hidden"
+      className="flex min-h-screen items-center justify-center bg-black text-white text-center p-6 relative overflow-x-hidden overflow-y-auto"
       style={{ touchAction: "manipulation" }}
     >
       <audio ref={audioRef} loop playsInline preload="auto">
         <source src="/musik/love.mp3" type="audio/mpeg" />
       </audio>
 
-      <div className="relative z-10">
+      <div className="relative z-10 w-full flex justify-center">
         {/* STEP 0 */}
         {step === 0 && (
           <div>
@@ -86,12 +87,12 @@ export default function Home() {
 
         {/* STEP 1 */}
         {step === 1 && (
-          <div className="relative w-[320px] h-[240px] flex items-center justify-center flex-col">
-            <h1 className="text-3xl mb-10 text-pink-300">
+          <div className="flex flex-col items-center gap-10">
+            <h1 className="text-3xl text-pink-300">
               Kamu sayang aku ga? 🥺
             </h1>
 
-            <div className="relative w-full h-24 flex items-center justify-center gap-6">
+            <div className="relative flex items-center justify-center gap-6 h-32">
               <button
                 onClick={yes}
                 onTouchStart={yes}
@@ -115,13 +116,14 @@ export default function Home() {
 
         {/* STEP 2 */}
         {step === 2 && (
-          <div className="max-w-xl animate-fade">
+          <div className="max-w-xl w-full flex flex-col items-center gap-6 py-10 animate-fade">
             <img
+              key={step}
               src="/her/photo.jpeg"
-              className="w-64 h-64 object-cover rounded-2xl mx-auto mb-6 shadow-2xl shadow-pink-500/40"
+              className="w-64 h-64 object-cover rounded-2xl shadow-2xl shadow-pink-500/40"
             />
 
-            <h1 className="text-5xl font-bold text-pink-400 mb-6">
+            <h1 className="text-5xl font-bold text-pink-400">
               Happy Valentine ❤️
             </h1>
 
@@ -139,22 +141,24 @@ aku juga bakal tetap di sini.`}
         )}
       </div>
 
-      {/* HEARTS BACKGROUND */}
-      <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
-        {hearts.map((h, i) => (
-          <span
-            key={i}
-            className="absolute text-pink-400 animate-fall select-none"
-            style={{
-              left: h.left + "vw",
-              animationDuration: h.duration + "s",
-              fontSize: h.size + "px",
-            }}
-          >
-            ❤️
-          </span>
-        ))}
-      </div>
+      {/* LOVE RAIN */}
+      {step === 2 && (
+        <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
+          {hearts.map((h, i) => (
+            <span
+              key={i}
+              className="absolute text-pink-400 animate-fall select-none"
+              style={{
+                left: h.left + "vw",
+                animationDuration: h.duration + "s",
+                fontSize: h.size + "px",
+              }}
+            >
+              ❤️
+            </span>
+          ))}
+        </div>
+      )}
     </main>
   );
 }
