@@ -33,23 +33,22 @@ export default function Home() {
 
   const start = () => setStep(1);
 
-  // play musik sampe berhasil
-  const playMusicReliable = () => {
+  // play musik (ga boleh block UI)
+  const playMusic = () => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const tryPlay = () => {
-      audio.play().catch(() => {
-        setTimeout(tryPlay, 200);
-      });
-    };
+    audio.currentTime = 0;
+    audio.muted = false;
 
-    tryPlay();
+    audio.play().catch(() => {
+      console.log("autoplay blocked");
+    });
   };
 
   const yes = () => {
     setStep(2);
-    setTimeout(playMusicReliable, 100);
+    setTimeout(playMusic, 80);
   };
 
   const moveNo = () => {
@@ -58,7 +57,7 @@ export default function Home() {
     setNoPos({ x, y });
   };
 
-  // hearts muncul saat step 2
+  // generate hearts saat step 2
   useEffect(() => {
     if (step !== 2) return;
 
@@ -77,17 +76,13 @@ export default function Home() {
       style={{ touchAction: "manipulation" }}
     >
       {/* AUDIO */}
-      <audio
-        ref={audioRef}
-        loop
-        playsInline
-        preload="auto"
-        onLoadedData={() => console.log("audio ready")}
-      >
+      <audio ref={audioRef} loop playsInline preload="auto">
         <source src="/musik/love.mp3" type="audio/mpeg" />
+        <source src="/musik/love.ogg" type="audio/ogg" />
       </audio>
 
       <div className="relative z-10 w-full flex justify-center">
+        {/* STEP 0 */}
         {step === 0 && (
           <div>
             <h1 className="text-4xl mb-6 text-pink-400 font-bold">
@@ -103,6 +98,7 @@ export default function Home() {
           </div>
         )}
 
+        {/* STEP 1 */}
         {step === 1 && (
           <div className="flex flex-col items-center gap-10">
             <h1 className="text-3xl text-pink-300">
@@ -131,6 +127,7 @@ export default function Home() {
           </div>
         )}
 
+        {/* STEP 2 */}
         {step === 2 && (
           <div className="max-w-xl w-full flex flex-col items-center gap-6 py-10 animate-fade">
             <img
@@ -156,6 +153,7 @@ aku juga bakal tetap di sini.`}
         )}
       </div>
 
+      {/* LOVE RAIN */}
       {step === 2 && (
         <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
           {hearts.map((h, i) => (
