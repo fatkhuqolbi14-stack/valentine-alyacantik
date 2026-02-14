@@ -33,22 +33,23 @@ export default function Home() {
 
   const start = () => setStep(1);
 
-  // play musik (ga boleh block UI)
-  const playMusic = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    audio.currentTime = 0;
-    audio.muted = false;
-
-    audio.play().catch(() => {
-      console.log("autoplay blocked");
-    });
-  };
-
+  // 🔥 CARA LAMA (YANG BIKIN BISA BUNYI)
   const yes = () => {
-    setStep(2);
-    setTimeout(playMusic, 80);
+    const audio = audioRef.current;
+
+    if (audio) {
+      audio.currentTime = 0;
+      audio.muted = false;
+      audio.volume = 1;
+
+      // dipanggil saat gesture user masih aktif
+      audio.play().catch(() => {});
+    }
+
+    // pindah halaman setelah play terpanggil
+    setTimeout(() => {
+      setStep(2);
+    }, 60);
   };
 
   const moveNo = () => {
@@ -57,7 +58,7 @@ export default function Home() {
     setNoPos({ x, y });
   };
 
-  // generate hearts saat step 2
+  // hearts muncul saat step 2
   useEffect(() => {
     if (step !== 2) return;
 
@@ -78,7 +79,6 @@ export default function Home() {
       {/* AUDIO */}
       <audio ref={audioRef} loop playsInline preload="auto">
         <source src="/musik/love.mp3" type="audio/mpeg" />
-        <source src="/musik/love.ogg" type="audio/ogg" />
       </audio>
 
       <div className="relative z-10 w-full flex justify-center">
