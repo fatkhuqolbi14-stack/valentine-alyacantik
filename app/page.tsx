@@ -31,25 +31,33 @@ export default function Home() {
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const start = () => setStep(1);
-
-  // 🔥 CARA LAMA (YANG BIKIN BISA BUNYI)
-  const yes = () => {
+  // 🔓 unlock audio saat interaksi pertama
+  const unlockAudio = () => {
     const audio = audioRef.current;
+    if (!audio) return;
 
-    if (audio) {
-      audio.currentTime = 0;
-      audio.muted = false;
-      audio.volume = 1;
+    audio.volume = 0;
+    audio.play()
+      .then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.volume = 1;
+      })
+      .catch(() => {});
+  };
 
-      // dipanggil saat gesture user masih aktif
-      audio.play().catch(() => {});
-    }
+  const start = () => {
+    unlockAudio(); // penting!
+    setStep(1);
+  };
 
-    // pindah halaman setelah play terpanggil
+  const yes = () => {
+    setStep(2);
+
+    // sekarang pasti boleh bunyi
     setTimeout(() => {
-      setStep(2);
-    }, 60);
+      audioRef.current?.play().catch(() => {});
+    }, 80);
   };
 
   const moveNo = () => {
@@ -58,7 +66,7 @@ export default function Home() {
     setNoPos({ x, y });
   };
 
-  // hearts muncul saat step 2
+  // hearts
   useEffect(() => {
     if (step !== 2) return;
 
@@ -76,13 +84,11 @@ export default function Home() {
       className="flex min-h-screen items-center justify-center bg-black text-white text-center p-6 relative overflow-x-hidden overflow-y-auto"
       style={{ touchAction: "manipulation" }}
     >
-      {/* AUDIO */}
       <audio ref={audioRef} loop playsInline preload="auto">
         <source src="/musik/love.mp3" type="audio/mpeg" />
       </audio>
 
       <div className="relative z-10 w-full flex justify-center">
-        {/* STEP 0 */}
         {step === 0 && (
           <div>
             <h1 className="text-4xl mb-6 text-pink-400 font-bold">
@@ -98,7 +104,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* STEP 1 */}
         {step === 1 && (
           <div className="flex flex-col items-center gap-10">
             <h1 className="text-3xl text-pink-300">
@@ -127,7 +132,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* STEP 2 */}
         {step === 2 && (
           <div className="max-w-xl w-full flex flex-col items-center gap-6 py-10 animate-fade">
             <img
@@ -153,7 +157,6 @@ aku juga bakal tetap di sini.`}
         )}
       </div>
 
-      {/* LOVE RAIN */}
       {step === 2 && (
         <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
           {hearts.map((h, i) => (
