@@ -32,23 +32,24 @@ export default function Home() {
 
   const yes = () => {
     setStep(2);
-    setTimeout(() => audioRef.current?.play(), 300);
+    setTimeout(() => audioRef.current?.play().catch(() => {}), 200);
   };
 
   const moveNo = () => {
-    const x = Math.random() * 200 - 100;
-    const y = Math.random() * 200 - 100;
+    const x = Math.random() * 260 - 130;
+    const y = Math.random() * 260 - 130;
     setNoPos({ x, y });
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-black text-white text-center p-6 relative overflow-hidden">
-
+    <main
+      className="flex min-h-screen items-center justify-center bg-black text-white text-center p-6 relative overflow-hidden"
+      style={{ touchAction: "manipulation" }}
+    >
       <audio ref={audioRef} loop>
         <source src="/musik/love.mp3" type="audio/mpeg" />
       </audio>
 
-      {/* STEP 0 */}
       {step === 0 && (
         <div>
           <h1 className="text-4xl mb-6 text-pink-400 font-bold">
@@ -56,32 +57,38 @@ export default function Home() {
           </h1>
           <button
             onClick={start}
-            className="bg-pink-500 px-6 py-3 rounded-full text-lg hover:scale-110 transition"
+            onTouchStart={start}
+            className="bg-pink-500 px-6 py-3 rounded-full text-lg active:scale-95 transition"
           >
             Klik Aku
           </button>
         </div>
       )}
 
-      {/* STEP 1 YES NO */}
       {step === 1 && (
-        <div className="relative">
+        <div className="relative w-[320px] h-[240px] flex items-center justify-center flex-col">
           <h1 className="text-3xl mb-10 text-pink-300">
             Kamu sayang aku ga? 🥺
           </h1>
 
-          <div className="flex gap-6 justify-center">
+          <div className="relative w-full h-24 flex items-center justify-center gap-6">
             <button
               onClick={yes}
-              className="bg-green-500 px-6 py-3 rounded-full text-lg hover:scale-110 transition"
+              onTouchStart={yes}
+              className="bg-green-500 px-6 py-3 rounded-full text-lg active:scale-95 transition z-10"
             >
               YES ❤️
             </button>
 
             <button
               onMouseEnter={moveNo}
-              style={{ transform: `translate(${noPos.x}px, ${noPos.y}px)` }}
-              className="bg-red-500 px-6 py-3 rounded-full text-lg absolute"
+              onTouchStart={moveNo}
+              onClick={moveNo}
+              style={{
+                transform: `translate(${noPos.x}px, ${noPos.y}px)`,
+                position: "absolute",
+              }}
+              className="bg-red-500 px-6 py-3 rounded-full text-lg select-none"
             >
               NO 😠
             </button>
@@ -89,10 +96,8 @@ export default function Home() {
         </div>
       )}
 
-      {/* STEP 2 HASIL */}
       {step === 2 && (
         <div className="max-w-xl animate-fade">
-
           <img
             src="/her/photo.jpeg"
             className="w-64 h-64 object-cover rounded-2xl mx-auto mb-6 shadow-2xl shadow-pink-500/40"
@@ -113,7 +118,6 @@ Selama kamu masih di sini,
 aku juga bakal tetap di sini.`}
           />
 
-          {/* LOVE RAIN */}
           <div className="pointer-events-none fixed inset-0 overflow-hidden">
             {Array.from({ length: 30 }).map((_, i) => (
               <span
