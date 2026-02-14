@@ -33,11 +33,13 @@ export default function Home() {
 
   const start = () => setStep(1);
 
-  const yes = async () => {
-    try {
-      await audioRef.current?.play();
-    } catch {}
+  // ⬇️ TIDAK BOLEH await — biar ga macet di HP
+  const yes = () => {
     setStep(2);
+
+    setTimeout(() => {
+      audioRef.current?.play().catch(() => {});
+    }, 60);
   };
 
   const moveNo = () => {
@@ -46,11 +48,11 @@ export default function Home() {
     setNoPos({ x, y });
   };
 
-  // ❤️ generate hearts SAAT step 2
+  // generate hearts saat step 2
   useEffect(() => {
     if (step !== 2) return;
 
-    const arr = Array.from({ length: 35 }).map(() => ({
+    const arr = Array.from({ length: 40 }).map(() => ({
       left: Math.random() * 100,
       duration: 4 + Math.random() * 5,
       size: 14 + Math.random() * 30,
