@@ -31,33 +31,25 @@ export default function Home() {
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // 🔓 unlock audio saat interaksi pertama
-  const unlockAudio = () => {
+  const start = () => setStep(1);
+
+  // play musik sampe berhasil
+  const playMusicReliable = () => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    audio.volume = 0;
-    audio.play()
-      .then(() => {
-        audio.pause();
-        audio.currentTime = 0;
-        audio.volume = 1;
-      })
-      .catch(() => {});
-  };
+    const tryPlay = () => {
+      audio.play().catch(() => {
+        setTimeout(tryPlay, 200);
+      });
+    };
 
-  const start = () => {
-    unlockAudio(); // penting!
-    setStep(1);
+    tryPlay();
   };
 
   const yes = () => {
     setStep(2);
-
-    // sekarang pasti boleh bunyi
-    setTimeout(() => {
-      audioRef.current?.play().catch(() => {});
-    }, 80);
+    setTimeout(playMusicReliable, 100);
   };
 
   const moveNo = () => {
@@ -66,7 +58,7 @@ export default function Home() {
     setNoPos({ x, y });
   };
 
-  // hearts
+  // hearts muncul saat step 2
   useEffect(() => {
     if (step !== 2) return;
 
@@ -84,7 +76,14 @@ export default function Home() {
       className="flex min-h-screen items-center justify-center bg-black text-white text-center p-6 relative overflow-x-hidden overflow-y-auto"
       style={{ touchAction: "manipulation" }}
     >
-      <audio ref={audioRef} loop playsInline preload="auto">
+      {/* AUDIO */}
+      <audio
+        ref={audioRef}
+        loop
+        playsInline
+        preload="auto"
+        onLoadedData={() => console.log("audio ready")}
+      >
         <source src="/musik/love.mp3" type="audio/mpeg" />
       </audio>
 
